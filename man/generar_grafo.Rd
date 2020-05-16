@@ -2,6 +2,7 @@
 % Please edit documentation in R/Seguridad.R
 \name{generar_grafo}
 \alias{generar_grafo}
+
 \title{Generar Grafo}
 \usage{
 generar_grafo(archivo_datos, separador = ",")
