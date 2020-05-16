@@ -1,0 +1,12 @@
+library(GRLgraph1)
+library(devtools)
+library(roxygen2)
+uni
+
+document()
+load_all(".")
+help(lm)
+roxygenise()
+?generar_grafo
+
+viewRd()

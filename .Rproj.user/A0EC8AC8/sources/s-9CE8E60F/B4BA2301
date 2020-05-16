@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1589641647635.000,
+    "dirty" : false,
+    "encoding" : "ISO8859-1",
+    "folds" : "",
+    "hash" : "1286206155",
+    "id" : "B4BA2301",
+    "lastKnownWriteTime" : 1589641652,
+    "last_content_update" : 1589641652665,
+    "path" : "~/GRLgraph1/man/generar_grafo.Rd",
+    "project_path" : "man/generar_grafo.Rd",
+    "properties" : {
+        "cursorPosition" : "18,60",
+        "scrollLine" : "0"
+    },
+    "read_only" : true,
+    "read_only_alternatives" : [
+        "R/Seguridad.R"
+    ],
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_doc"
+}
