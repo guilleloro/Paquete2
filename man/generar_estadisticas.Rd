@@ -3,6 +3,7 @@
 \name{generar_estadisticas}
 \alias{generar_estadisticas}
 \title{Generar Estad?sticas}
+
 \usage{
 generar_estadisticas(grafo, salida_pdf, salida_txt)
 }
