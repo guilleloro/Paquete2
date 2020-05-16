@@ -2,11 +2,12 @@
 % Please edit documentation in R/Seguridad.R
 \name{generar_grafo}
 \alias{generar_grafo}
-
 \title{Generar Grafo}
 \usage{
 generar_grafo(archivo_datos, separador = ",")
 }
+
+
 \arguments{
 \item{archivo_datos}{ruta al archivo CSV que contiene la matriz de adyacencia.
 La matriz tiene que tener cabecera tanto horizontal como vertical.}
