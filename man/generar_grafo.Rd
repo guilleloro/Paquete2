@@ -6,8 +6,6 @@
 \usage{
 generar_grafo(archivo_datos, separador = ",")
 }
-
-
 \arguments{
 \item{archivo_datos}{ruta al archivo CSV que contiene la matriz de adyacencia.
 La matriz tiene que tener cabecera tanto horizontal como vertical.}
@@ -18,5 +16,5 @@ La matriz tiene que tener cabecera tanto horizontal como vertical.}
 el grafo correspondiente a la matriz de adyacencia.
 }
 \description{
-Funci√≥n que genera un grafo a a partir de una matriz de adyacencia contenida
+Funci”n que genera un grafo a a partir de una matriz de adyacencia contenida
 }
