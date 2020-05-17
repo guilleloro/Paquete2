@@ -139,5 +139,249 @@ generar_estadisticas <-function(grafo,salida_pdf,salida_txt){
 }
 
 
+#' @title Crear grafo a partir de lista de enlaces.
+#'
+#' @description Función que genera un grafo a a partir de la lista de enlaces entre vértices.
+#' @param  fichero  ruta al archivo que contiene la lista de enlaces, puede ser .txt o .csv.
+#'  Cada fila del fichero contiene los dos vértices que forman cada enlace.
+#' @param identificadores booleano que indica si el identificador de cada vértice es númerico
+#' o no. En caso de ser númerico la función lo convierte a carácteres.
+#' @param sep carácter que separa en el fichero los dos vértices de cada enlace. Por defecto será
+#' uno o más espacios en blanco
+#' @return  el grafo correspondiente a la lista de enlaces.
+#' @export
+crear_grafo_desde_tabla_enlaces <-function(fichero,identNumerico,sep=""){
+  enlaces<- read.table(fichero, header=F,sep)
+  enlaces <-as.matrix(enlaces)
+  if(identNumerico == FALSE){
+    grafo <-graph_from_edgelist(enlaces,directed =FALSE)
+    return(grafo)
+  }
+  else{
+    enlaces[,1] <-as.character(enlaces[,1])
+    enlaces[,2] <-as.character(enlaces[,2])
+    grafo <-graph_from_edgelist(enlaces,directed =FALSE)
+    return(grafo)
+  }
+}
+
+#' @title Subgrafo inducido.
+#'
+#' @description Función que crea una muestra de un grafo con la técnica de muestreo inducido.
+#' @param  grafo  grafo que se quiere muestrear .
+#' @param lonMuestra tamaño del conjunto inicial de vértices muestreados.
+#' @return  subgrafo muestreado.
+#' @export
+
+crear_subgrafo_inducido <- function(grafo ,lonMuestra){
+  inducido <- induced.subgraph(grafo,vids = sample(V(grafo),lonMuestra))
+  return(inducido)
+}
+
+
+
+#' @title Subgrafo incidente.
+#'
+#' @description Función que crea una muestra de un grafo con la técnica de muestreo incidente.
+#' @param  grafo  grafo que se quiere muestrear .
+#' @param lonMuestra  tamaño del conjunto inicial de enlaces de la muestra.
+#' @return  subgrafo muestreado.
+#' @export
+
+crear_subgrafo_incidente <- function(grafo ,lonMuestra){
+  incidente <- subgraph.edges(grafo,sample(E(grafo),lonMuestra))
+  return(incidente)
+}
+
+#' @title Función auxiliar.
+#'
+#' @description Función auxiliar utilizada para el muestreo estrella.
+#' @param  x  .
+#' @return  .
+#' @export
+duplicar <- function(x){
+  return(rep(x[[1]]$name,length(x)))
+}
+
+#' @title Subgrafo estrella.
+#'
+#' @description Función que crea una muestra de un grafo con la técnica de muestreo estrella.
+#' @param  grafo  grafo que se quiere muestrear .
+#' @param lonMuestra  tamaño del conjunto inicial de vértices de la muestra.
+#' @return  subgrafo muestreado.
+#' @export
+
+crear_subgrafo_estrella <- function(grafo,lonMuestra){
+  # Cálculamos el conjunto de vértices inicial y sus vecinos
+  vecindario <-neighborhood(grafo,order=1,nodes = sample(V(grafo),lonMuestra))
+  # vecindario contendrá una lista donde cada entrada es una lista que contiene los vértices adyacentes a uno de
+  # los vértices muestreados en e conjunto inicial
+  # calculamos la lista de enlaces del subgrafo
+  listado1 <- unlist(lapply(vecindario,duplicar))
+  listado2 <-names(unlist(vecindario))
+  listado <- data.frame(listado1,listado2)
+  #eliminamos enlaces duplicados de la lista
+  listado$listado1 <- ifelse(listado1 < listado2,as.character(listado1),as.character(listado2))
+  listado$listado2 <- ifelse(listado1 < listado2,as.character(listado2),as.character(listado1))
+  listado <-listado[which(duplicated(listado) == F),]
+  #eliminamos bucles
+  listado <-listado[which(listado$listado1 != listado$listado2),]
+  # creamos lista con los vértices que tendra el grafo
+  vertices <-c(listado$listado1,listado$listado2)
+  vertices <- vertices[!duplicated(vertices)]
+  grafo_estrella <-graph_from_data_frame(d=listado, vertices=vertices, directed=FALSE)
+  return(grafo_estrella)
+}
+
+
+#' @title Estimador del número de enlaces con muestreo inducido.
+#'
+#' @description Estimador del número de enlaces de un grafo. Usa una muestra del grafo
+#' generada mediante muestreo inducido y el estimador de Hortvitz-Thompson.
+#' @param inducido subgrafo generado mediante muestreo inducido.
+#' @param numVertices número del vértices del grafo original.
+#' @return  estimación del número de enlaces.
+#' @export
+
+estimacion_num_enlaces_con_subgrafo_inducido<-function(inducido,numVertices){
+  numVerticesInd <- vcount(inducido)
+  numEnlacesInd <- ecount(inducido)
+  return(numEnlacesInd/((numVerticesInd*(numVerticesInd-1))/(numVertices*(numVertices-1))))
+}
+
+
+#' @title Estimador del número de enlaces con muestreo estrella.
+#'
+#' @description Estimador del número de enlaces de un grafo. Usa una muestra del grafo
+#' generada mediante muestreo estrella y el estimador de Hortvitz-Thompson.
+#' @param  estrella subgrafo generado mediante muestreo estrella.
+#' @param numVertices número del vértices del grafo original.
+#' @param lonMuestra0: tamaño del conjunto inicial de vértices utilizado
+#' para el muestreo estrella.
+#' @return  estimación del número de enlaces.
+#' @export
+
+estimacion_num_enlaces_con_subgrafo_estrella<-function(estrella,numVertices,lonMuestra0){
+  probabilidad <- as.numeric(1 -(as.bigq(chooseZ((numVertices-2),lonMuestra0)/chooseZ(numVertices,lonMuestra0))))
+  numEnlacesEst <- ecount(estrella)
+  return(numEnlacesEst/probabilidad)
+}
+
+#' @title Estimador del grado medio del grafo con muestreo incidente
+#'
+#' @description Estimador del grado medio del grafo. Usa una muestra del grafo
+#' generada mediante muestreo incidente y Hortvitz-Thompson.
+#' @param  incidente subgrafo generado mediante muestreo incidente.
+#' @param  numEnlaces  número de enlaces del grafo original.
+#' @param numVertices número del vértices del grafo original.
+#' @param distribuccionesInc lista con los grados de los vértices muestreados.
+#' @return  estimación del grado medio de los vértices del grafo.
+#' @export
+
+estimacion_grado_medio_con_subgrafo_incidente<-function(incidente,numEnlaces,numVertices,distribuccionesInc){
+  numEnlacesInc <- ecount(incidente)
+  #calculamos las probabilidades que tiene cada vertice de ser incluido
+  probabilidades <-1 -(as.bigq(chooseZ((numEnlaces -distribuccionesInc),numEnlacesInc)/chooseZ(numEnlaces,numEnlacesInc)))
+  return(horvitzThompson(y = distribuccionesInc, pi = as.numeric(probabilidades), N=numVertices)[2])
+}
+
+#' @title Estimador del grado medio del grafo con muestreo estrella
+#'
+#' @description Estimador del grado medio del grafo. Usa una muestra del grafo
+#' generada mediante muestreo estrella y el estimador de Hortvitz-Thompson.
+#' @param  estrella subgrafo generado mediante muestreo estrella.
+#' @param numVertices número del vértices del grafo original.
+#' @param distribuccionesEst lista con los grados de los vértices muestreados.
+#' @param lonMuestra0 tamaño del conjunto inicial de vértices utilizado
+#' para el muestreo estrella.
+#' @return estimación del grado medio de los vértices del grafo.
+#' @export
+
+estimacion_grado_medio_con_subgrafo_estrella<-function(estrella,numVertices,distribuccionesEst,lonMuestra0){
+  verticesEst <- V(estrella)
+  tamanoVecindario <- distribuccionesEst +1
+  #calculamos las probabilidades que tiene cada vertice de ser incluido
+  probabilidades <-1 -(as.bigq(chooseZ((numVertices-tamanoVecindario),lonMuestra0)/chooseZ(numVertices,lonMuestra0)))
+  return(horvitzThompson(y = distribuccionesEst, pi = as.numeric(probabilidades), N=numVertices)[2])
+}
+
+
+#' @title Estimador del número de vértices del grafo con muestreo incidente
+#'
+#' @description Estimador del número de vértices del grafo. Usa una muestra del grafo
+#' generada mediante muestreo incidente y el estimador de  Hortvitz-Thompson.
+#' @param incidente subgrafo generado mediante muestreo incidente.
+#' @param numEnlaces número de enlaces del grafo original.
+#' @param distribuccionesInc lista con los grados de los vértices muestreados.
+#' @return estimación del número de vértices del grafo.
+#' @export
+
+estimacion_num_vertices_con_subgrafo_incidente <-function(incidente,numEnlaces,distribuccionesInc){
+  numEnlacesInc <- ecount(incidente)
+  numVerticesInc <- vcount(incidente)
+  probabilidades <-1 -(as.bigq(chooseZ((numEnlaces -distribuccionesInc),numEnlacesInc)/chooseZ(numEnlaces,numEnlacesInc)))
+  return(horvitzThompson(y =rep(1,numVerticesInc), pi = as.numeric(probabilidades))[1])
+}
+
+
+
+#' @title Estimador del número de vértices del grafo con captura-recaptura
+#'
+#' @description Estimador del número de vértices del grafo usando la
+#' técnica de captura-recaptura.
+#' @param grafo grafo del que se quiere calcular el número de vértices.
+#' @param lonMuestra1 longitud del primer conjunto de vértices muestrado.
+#' @param lonMuestra2 longitud del segundo conjunto de vértices muestreado.
+#' @return estimación del número de vértices del grafo.
+#' @export
+
+estimacion_num_vertices_cap_recaptura <- function(grafo,lonMuestra1,lonMuestra2){
+  muestra1 <- sample(V(grafo),lonMuestra1)
+  muestra2 <- sample(V(grafo),lonMuestra2)
+  iguales <- length(which(muestra1 %in% muestra2))
+  estimacion_vertices_captura <- (lonMuestra1*lonMuestra2)/ iguales
+  return(estimacion_vertices_captura)
+}
+
+#' @title Estimador del número de vértices del grafo con muestreo estrella.
+#'
+#' @description Estimador del número de vértices del grafo. Usa la técnica de estimación
+#' del tamaño de poblaciones con muestreo estrella, que no utiliza el estimador de Hortvitz-Thompson.
+#' @param grafo grafo del que se quiere calcular el número de vértices .
+#' @param p0 probabilidad de inclusión de cada vértice en la muestra inicial.
+#' @return estimación del número de vértices del grafo.
+#' @export
+
+estimacion_num_vertices_estrella_sin_HT <- function(grafo,p0){
+  #seleccionamos la muestra inicial con muestreo bernoulli
+  muestreados <- rbernoulli(vcount(grafo),p0)
+  #calculamos m1, enlaces entre vertices de V0*
+  enlaces_internos <- ecount(induced.subgraph(grafo,vids = V(grafo)[muestreados]))
+  #creamos el subgrafo estrella etiquetado
+  vecindario <-neighborhood(grafo,order=1,nodes = V(grafo)[muestreados])
+  # calculamos la lista de enlaces del subgrafo
+  listado1 <- unlist(lapply(vecindario,duplicar))
+  listado2 <-names(unlist(vecindario))
+  listado <- data.frame(listado1,listado2)
+  #eliminamos enlaces duplicados de la lista
+  listado$listado1 <- ifelse(listado1 < listado2,as.character(listado1),as.character(listado2))
+  listado$listado2 <- ifelse(listado1 < listado2,as.character(listado2),as.character(listado1))
+  listado <-listado[which(duplicated(listado) == F),]
+  #eliminamos bucles de la lista
+  listado <-listado[which(listado$listado1 != listado$listado2),]
+  # creamos lista con los vertices que tendrá el grafo
+  vertices <-c(listado$listado1,listado$listado2)
+  vertices <- vertices[!duplicated(vertices)]
+  grafo_estrella <-graph_from_data_frame(d=listado,vertices = vertices, directed=FALSE)
+  #calculamos m2 enlaces entre elementos de V0* y V1*
+  enlaces_externos <- ecount(grafo_estrella) - enlaces_internos
+  probabilidad <- 2*enlaces_internos/((enlaces_externos + (2*enlaces_internos)))
+  estimacion_vertices <- sum(muestreados)/probabilidad
+  return(estimacion_vertices)
+}
+
+
+
+
 
 
