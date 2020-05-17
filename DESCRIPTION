@@ -9,6 +9,16 @@ Description: More about what it does (maybe more than one line)
 License: What license is it under?
 Encoding: UTF-8
 RoxygenNote: 7.1.0
-Imports: Rdpack
+Imports: Rdpack,
+         mase,
+         gmp,
+         igraph,
+         readr,
+         purrr
 RdMacros: Rdpack
 Language: nob 
+Depends: mase,
+         gmp,
+         igraph,
+         readr,
+         purrr
