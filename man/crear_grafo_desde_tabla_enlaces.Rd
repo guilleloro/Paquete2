@@ -8,17 +8,17 @@ crear_grafo_desde_tabla_enlaces(fichero, identNumerico, sep = "")
 }
 \arguments{
 \item{fichero}{ruta al archivo que contiene la lista de enlaces, puede ser .txt o .csv.
-Cada fila del fichero contiene los dos v?rtices que forman cada enlace.}
+Cada fila del fichero contiene los dos vértices que forman cada enlace.}
 
-\item{sep}{car?cter que separa en el fichero los dos v?rtices de cada enlace. Por defecto ser?
-uno o m�s espacios en blanco}
+\item{sep}{carácter que separa en el fichero los dos vértices de cada enlace. Por defecto será
+uno o más espacios en blanco}
 
-\item{identificadores}{booleano que indica si el identificador de cada v?rtice es n?merico
-o no. En caso de ser n?merico la funci?n lo convierte a car?cteres.}
+\item{identificadores}{booleano que indica si el identificador de cada vértice es númerico
+o no. En caso de ser númerico la función lo convierte a carácteres.}
 }
 \value{
 el grafo correspondiente a la lista de enlaces.
 }
 \description{
-Funci?n que genera un grafo a a partir de la lista de enlaces entre v?rtices.
+Función que genera un grafo a a partir de la lista de enlaces entre vértices.
 }
