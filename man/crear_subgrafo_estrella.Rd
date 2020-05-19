@@ -6,6 +6,7 @@
 \usage{
 crear_subgrafo_estrella(grafo, lonMuestra)
 }
+
 \arguments{
 \item{grafo}{grafo que se quiere muestrear .}
 
