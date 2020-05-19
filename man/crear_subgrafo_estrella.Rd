@@ -10,11 +10,11 @@ crear_subgrafo_estrella(grafo, lonMuestra)
 \arguments{
 \item{grafo}{grafo que se quiere muestrear .}
 
-\item{lonMuestra}{tamaño del conjunto inicial de vértices de la muestra.}
+\item{lonMuestra}{tamaÃ±o del conjunto inicial de vÃ©rtices de la muestra.}
 }
 \value{
 subgrafo muestreado.
 }
 \description{
-Función que crea una muestra de un grafo con la técnica de muestreo estrella.
+FunciÃ³n que crea una muestra de un grafo con la tÃ©cnica de muestreo estrella.
 }
