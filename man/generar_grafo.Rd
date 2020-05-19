@@ -15,7 +15,6 @@ La matriz tiene que tener cabecera tanto horizontal como vertical.}
 \value{
 el grafo correspondiente a la matriz de adyacencia.
 }
-
 \description{
-Función que genera un grafo a a partir de una matriz de adyacencia contenida
+FunciÃ³n que genera un grafo a a partir de una matriz de adyacencia contenida
 }
