@@ -7,12 +7,12 @@
 generar_estadisticas(grafo, salida_pdf, salida_txt)
 }
 \arguments{
-\item{grafo}{objeto tipo grafo de igraph del que queremos extraer sus caracter√≠sticas.}
+\item{grafo}{objeto tipo grafo de igraph del que queremos extraer sus caracterÌsticas.}
 
-\item{salida_pdf}{ruta al archivo .pdf donde se dibujar√°n los grafos.}
+\item{salida_pdf}{ruta al archivo .pdf donde se dibujar·n los grafos.}
 
-\item{salida_txt}{ruta al archivo .txt donde se escribir√° el resto de informaci√≥n}
+\item{salida_txt}{ruta al archivo .txt donde se escribir· el resto de informaciÛn}
 }
 \description{
-Funci√≥n que genera las principales caracter√≠sticas y propiedades de un grafo
+FunciÛn que genera las principales caracterÌsticas y propiedades de un grafo
 }
